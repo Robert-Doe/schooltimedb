@@ -73,6 +73,10 @@ app.use('/halls', hallRouter);
 app.use('/batches', batchRouter);
 app.use('/courses', courseRouter);
 app.use('/periods', periodRouter);
+app.get('/',(req,res)=>{
+    res.json({msg:'HOME PAGE'});
+})
+
 
 
 app.listen(PORT, () => {
