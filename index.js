@@ -18,6 +18,8 @@ const fs = require('fs')
 const csv2json = require('csvjson-csv2json/csv2json')
 dotenv.config()
 
+const PORT=process.env.PORT || 80
+
 
 app.use(cors())
 app.use(express.json())
@@ -73,6 +75,6 @@ app.use('/courses', courseRouter);
 app.use('/periods', periodRouter);
 
 
-app.listen(9999, () => {
+app.listen(PORT, () => {
     console.log("I am listening to port 9999")
 })
