@@ -1,6 +1,13 @@
 const express = require('express')
 const router = express.Router()
 const Department = require('../model/department')
+const fileUpload = require('express-fileupload');
+const fs = require('fs')
+const csv2json = require('csvjson-csv2json/csv2json')
+
+
+router.use(fileUpload());
+
 
 // middleware that is specific to this router
 router.use(function timeLog(req, res, next) {
@@ -29,8 +36,7 @@ router.use(function timeLog(req, res, next) {
 router.get('/', function (req, res) {
 
     Department.find({}, (err, data) => {
-        if (err)
-            return res.status(400).json({msg: "No Data"})
+        if (err) return res.status(400).json({msg: "No Data"})
         res.status(200).json(data)
     })
 
@@ -62,16 +68,48 @@ router.put('/:id', (req, res) => {
 })
 
 
+/*Adding a New Departments Using Files Upload*/
+router.post('/upload', function (req, res) {
+    let sampleFile;
+    let uploadPath;
+
+    if (!req.files || Object.keys(req.files).length === 0) {
+        return res.status(400).send('No files were uploaded.');
+    }
+
+    // The name of the input field (i.e. "sampleFile") is used to retrieve the uploaded file
+    sampleFile = req.files.sampleFile;
+    uploadPath = __dirname + '/../uploads/departments/' + sampleFile.name;
+
+    // Use the mv() method to place the file somewhere on your server
+    sampleFile.mv(uploadPath, function (err) {
+        if (err) return res.status(500).send(err);
+        fs.readFile(uploadPath, "utf8", (err, data) => {
+            if (err) return res.status(500).send(err);
+            let dataFile = csv2json(data, {parseNumbers: true})
+            let validFiles = dataFile.filter(sample => (sample.name && sample._id && sample.name))
+            Department.insertMany(validFiles)
+                .then(result => {
+                    res.status(200).json({msg: 'Insert Successful', success: result});
+                })
+                .catch(error => {
+                    return res.status(400).json({msg: 'Could Not Insert Files'});
+                });
+        })
+    });
+});
+
+
+
+
 /*Adding a New Department*/
 router.post('/', function (req, res) {
 
     const {name, dept_abbr} = req.body;
     const newDepartment = new Department({
         "name": req.body.name,
-        /* "details":req.body.details,*/
-        /*    "course_info":req.body.course_info,*/
+        "_id":req.body._id,
         "dept_abbr": req.body.dept_abbr,
-        /*"lecturers":req.body.lecturers*/
     });
 
 

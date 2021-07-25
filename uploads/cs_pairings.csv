@@ -1,0 +1,5 @@
+_id,year,dept_id,size,name,class_size
+086-1A,100,csdepartment,200,XS1-A,500
+,100,csdepartment,200,XS2-A,500
+086-1C,100,csdepartment,200,XS3-B,500
+086-2D,100,csdepartment,200,XS4-A,500
