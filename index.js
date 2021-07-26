@@ -19,7 +19,7 @@ const csv2json = require('csvjson-csv2json/csv2json')
 dotenv.config()
 
 const PORT=process.env.PORT || 80
-alert("here");
+
 
 app.use(cors())
 app.use(express.json())
