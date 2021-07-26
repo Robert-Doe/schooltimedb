@@ -54,12 +54,10 @@ router.put('/:id', (req, res) => {
 /*Adding a New Session*/
 router.post('/', function (req, res) {
     const newSession = new Session({
-        "course_id": req.body.course_id,
-        "lecturer_id": req.body.lecturer_id,
+        "pair_id": req.body.pair_id,
+        "batch_id": req.body.batch_id,
         "hall_id": req.body.hall_id,
-        "period": req.body.period,
-        "day": req.body.day,
-        "key": req.body.key
+        "period": req.body.period
     });
 
     newSession.save(function (err) {
