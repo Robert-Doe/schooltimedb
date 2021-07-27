@@ -21,7 +21,7 @@ dotenv.config()
 const PORT=process.env.PORT || 80
 
 
-app.use(cors({origin:'http://localhost:3001')
+app.use(cors({origin:null})
 app.use(express.json())
 app.use(bodyParser.urlencoded({extended: false}))
 app.use(bodyParser.json())
