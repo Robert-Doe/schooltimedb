@@ -55,7 +55,7 @@ app.use(bodyParser.json({type: 'application/*+json'}))
 // });
 
 // Add headers
-/*app.use(function (req, res, next) {
+app.use(function (req, res, next) {
 
     // Website you wish to allow to connect
     res.setHeader('Access-Control-Allow-Origin', 'http://localhost:3001');
@@ -72,7 +72,7 @@ app.use(bodyParser.json({type: 'application/*+json'}))
 
     // Pass to next layer of middleware
     next();
-});*/
+});
 
 
 const mongoDB = process.env.ATLAS_URI;
