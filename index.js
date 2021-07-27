@@ -21,7 +21,7 @@ dotenv.config()
 const PORT=process.env.PORT || 80
 
 
-app.use(cors({origin:null})
+app.use(cors()
 app.use(express.json())
 app.use(bodyParser.urlencoded({extended: false}))
 app.use(bodyParser.json())
@@ -55,7 +55,7 @@ app.use(bodyParser.json({type: 'application/*+json'}))
 // });
 
 // Add headers
-app.use(function (req, res, next) {
+/*app.use(function (req, res, next) {
 
     // Website you wish to allow to connect
     res.setHeader('Access-Control-Allow-Origin', 'http://localhost:3001');
@@ -72,7 +72,7 @@ app.use(function (req, res, next) {
 
     // Pass to next layer of middleware
     next();
-});
+});*/
 
 
 const mongoDB = process.env.ATLAS_URI;
