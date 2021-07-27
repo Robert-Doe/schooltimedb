@@ -21,7 +21,7 @@ dotenv.config()
 const PORT=process.env.PORT || 80
 
 
-app.use(cors())
+app.use(cors({origin:'*'}))
 app.use(express.json())
 app.use(bodyParser.urlencoded({extended: false}))
 app.use(bodyParser.json())
@@ -58,7 +58,7 @@ app.use(bodyParser.json({type: 'application/*+json'}))
 app.use(function (req, res, next) {
 
     // Website you wish to allow to connect
-    res.setHeader('Access-Control-Allow-Origin', 'http://localhost:3001');
+    res.setHeader('Access-Control-Allow-Origin', '*');
 
     // Request methods you wish to allow
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
