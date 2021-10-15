@@ -1,5 +1,2 @@
-_id,year,dept_id,size,name,class_size
-086-4A,200,086,200,XT1-A,500
-086-5D,200,086,200,XT2-A,500
-086-6C,200,086,200,XT3-B,500
-086-8D,200,086,200,XT4-A,500
+﻿_id,lecturer_id,course_id
+1660717-CSM123,1660717,CSM123

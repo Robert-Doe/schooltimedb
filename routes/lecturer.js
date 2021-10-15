@@ -48,6 +48,13 @@ router.delete('/:id', (req, res) => {
     });
 })
 
+router.delete('/', (req, res) => {
+    Lecturer.deleteMany({}, function (err) {
+        if (err) res.status(400).send(err)
+        res.json({msg: "Successful deletion"});
+    });
+})
+
 /*Updating a Lecturer By Id*/
 router.put('/:id', (req, res) => {
     res.send(`Update lecturer with respect to its ${req.params.id}`)
@@ -73,13 +80,17 @@ router.post('/upload', function (req, res) {
         fs.readFile(uploadPath, "utf8", (err, data) => {
             if (err) return res.status(500).send(err);
             let dataFile = csv2json(data, {parseNumbers: true})
-            let validFiles = dataFile.filter(sample => (sample.name && sample._id && sample.size))
+            let validFiles = dataFile.filter(sample => (sample.fname && sample.lname && sample._id && sample.dept_id))
+
+            if(validFiles.length!==dataFile.length){
+                return res.status(400).json({msg:'File Rejected : Data in .csv file Incorrect/Incomplete',status:'rejected'});
+            }
             Lecturer.insertMany(validFiles)
                 .then(result => {
-                    res.status(200).json({msg: 'Insert Successful', success: result});
+                    res.status(200).json({msg:'Insert Successful', success: result,status:'success'});
                 })
                 .catch(error => {
-                    return res.status(400).json({msg: 'Could Not Insert Files'});
+                    return res.status(400).json({msg:'Could Not Insert Files',error:error});
                 });
         })
     });
@@ -93,10 +104,8 @@ router.post('/', function (req, res) {
         "_id":req.body._id,
         "fname": req.body.fname,
         "dept_id": req.body.dept_id,
-        "courses": req.body.courses,
-        "sessions": req.body.sessions,
         "lname": req.body.lname,
-        "abbr:": req.body.abbr
+        "abbr": req.body.abbr
     });
     // newLecturer.save(function (err) {
     //     if (err)
@@ -108,13 +117,13 @@ router.post('/', function (req, res) {
 
     Lecturer.find({})
         .exec({}, (error, data) => {
-            if (error) return res.status(400).send(error);
+            if (error) return res.status(400).json(error);
             if (data.some((datum) => (datum.dept_id === dept_id && (datum.abbr === abbr)))) {
-                return res.status(400).send({msg: "Cannot Duplicate"})
+                return res.status(400).json({msg:"Duplicate Found",status:'failure'})
             } else {
                 newLecturer.save((err) => {
-                    if (err) return res.status(400).send(err)
-                    res.status(200).json({"msg": "Save Successfully"})
+                    if (err) return res.status(400).json(err)
+                    res.status(200).json({msg: "Save Successfully",status:'success'})
                 })
             }
         });

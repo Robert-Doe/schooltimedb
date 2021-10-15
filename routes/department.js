@@ -59,6 +59,14 @@ router.delete('/:id', (req, res) => {
     });
 })
 
+
+router.delete('/', (req, res) => {
+    Department.deleteMany({}, function (err) {
+        if (err) res.status(400).send(err)
+        res.json({msg: "Successful deletion"});
+    });
+})
+
 /*Updating a Department By Id*/
 router.put('/:id', (req, res) => {
     Department.findById({"_id": req.params.id}, function (err, data) {
@@ -87,13 +95,16 @@ router.post('/upload', function (req, res) {
         fs.readFile(uploadPath, "utf8", (err, data) => {
             if (err) return res.status(500).send(err);
             let dataFile = csv2json(data, {parseNumbers: true})
-            let validFiles = dataFile.filter(sample => (sample.name && sample._id && sample.name))
+            let validFiles = dataFile.filter(sample => (sample.name && sample._id && sample.dept_abbr))
+            if(validFiles.length!==dataFile.length){
+                return res.status(400).json({msg:'File Rejected : Data in .csv file Incorrect/Incomplete',status:'rejected'});
+            }
             Department.insertMany(validFiles)
                 .then(result => {
-                    res.status(200).json({msg: 'Insert Successful', success: result});
+                    res.status(200).json({msg: 'Insert Successful', success: result,status:'success'});
                 })
                 .catch(error => {
-                    return res.status(400).json({msg: 'Could Not Insert Files'});
+                    return res.status(400).json({msg: 'Could Not Insert Files',error:error});
                 });
         })
     });

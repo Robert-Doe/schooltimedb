@@ -1,10 +1,10 @@
 const express = require('express')
 const router = express.Router()
-const Hall = require('../model/hall')
 
 const fileUpload = require('express-fileupload');
 const fs = require('fs')
 const csv2json = require('csvjson-csv2json/csv2json')
+const Hall = require("../model/hall");
 
 
 router.use(fileUpload());
@@ -40,6 +40,13 @@ router.delete('/:id', (req, res) => {
     });
 })
 
+router.delete('/', (req, res) => {
+    Hall.deleteMany({}, function (err) {
+        if (err) res.status(400).send(err)
+        res.json({msg: "Successful deletion"});
+    });
+})
+
 /*Updating a Hall By Id*/
 router.put('/:id', (req, res) => {
     res.send(`Update hall with respect to its ${req.params.id}`)
@@ -65,26 +72,45 @@ router.post('/upload', function (req, res) {
         fs.readFile(uploadPath, "utf8", (err, data) => {
             if (err) return res.status(500).send(err);
             let dataFile = csv2json(data, {parseNumbers: true})
-            let validFiles = dataFile.filter(sample => (sample.name && sample._id && sample.size))
+            let validFiles = dataFile.filter(sample => (sample._id && sample.location && sample.size && sample.type))
+            if(validFiles.length!==dataFile.length){
+                return res.status(400).json({msg:'File Rejected : Data in .csv file Incorrect/Incomplete',status:'rejected'});
+            }
             Hall.insertMany(validFiles)
                 .then(result => {
-                    res.status(200).json({msg: 'Insert Successful', success: result});
+                    res.status(200).json({msg: 'Insert Successful', success: result,status:'success'});
                 })
                 .catch(error => {
-                    return res.status(400).json({msg: 'Could Not Insert Files'});
+                    return res.status(400).json({msg: 'Could Not Insert Files',error:error});
                 });
         })
     });
 });
 
 
-
-
-
-
 /*Adding a New Hall*/
 router.post('/', function (req, res) {
-    res.send('Add New Hall')
+    const {type, size,location,_id} = req.body;
+    const newHall = new Hall({
+        "_id": _id,
+        "location": location,
+        "size": size,
+        "type": type
+    });
+
+
+    Hall.find({})
+        .exec({}, (error, data) => {
+            if (error) return res.status(400).send(error);
+            if (data.some((datum) => (datum._id ===_id))) {
+                return res.status(400).send({msg: "Cannot Duplicate"})
+            } else {
+                newHall.save((err) => {
+                    if (err) return res.status(400).send(err)
+                    res.status(200).json({"msg": "Save Successfully"})
+                })
+            }
+        });
 })
 
 module.exports = router

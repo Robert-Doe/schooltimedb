@@ -144,6 +144,13 @@ router.delete('/:id', (req, res) => {
     });
 })
 
+router.delete('/:id', (req, res) => {
+    Session.deleteMany({}, function (err) {
+        if (err) res.status(400).send(err)
+        res.json({msg: "Successful deletion"});
+    });
+})
+
 /*Updating a Session By Id*/
 router.put('/:id', (req, res) => {
     res.send(`Update session with respect to its ${req.params.id}`)

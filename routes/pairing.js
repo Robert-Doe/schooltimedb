@@ -59,6 +59,13 @@ router.delete('/:id', (req, res) => {
     });
 });
 
+router.delete('/', (req, res) => {
+    Pairing.deleteMany({}, function (err) {
+        if (err) res.status(400).send(err)
+        res.json({msg: "Successful deletion"});
+    });
+});
+
 /*Updating a Pairing By Id*/
 router.put('/:id', (req, res) => {
     res.send(`Update pairing with respect to its ${req.params.id}`)
@@ -84,13 +91,16 @@ router.post('/upload', function (req, res) {
         fs.readFile(uploadPath, "utf8", (err, data) => {
             if (err) return res.status(500).send(err);
             let dataFile = csv2json(data, {parseNumbers: true})
-            let validFiles = dataFile.filter(sample => (sample.name && sample._id && sample.size))
+            let validFiles = dataFile.filter(sample => (sample._id && sample.lecturer_id && sample.course_id))
+            if(validFiles.length!==dataFile.length){
+                return res.status(400).json({msg:'File Rejected : Data in .csv file Incorrect/Incomplete',status:'rejected'});
+            }
             Pairing.insertMany(validFiles)
                 .then(result => {
-                    res.status(200).json({msg: 'Insert Successful', success: result});
+                    res.status(200).json({msg: 'Insert Successful', success: result,status:'success'});
                 })
                 .catch(error => {
-                    return res.status(400).json({msg: 'Could Not Insert Files'});
+                    return res.status(400).json({msg: 'Could Not Insert Files',error:error});
                 });
         })
     });
@@ -106,8 +116,8 @@ router.post('/', function (req, res) {
 
     newPairing.save(function (err) {
         if (err)
-            return res.status(400).json({msg:'err Could Not Insert'});
-        res.json({msg: "Saved Successfully"})
+            return res.status(400).json({msg:'err Could Not Insert',status:'error'});
+        res.json({msg: "Saved Successfully",status:"success"})
         console.log("Save Successfully");
     });
 });

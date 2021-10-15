@@ -91,12 +91,17 @@ router.post('/upload', function (req, res) {
             let dataFile = csv2json(data, {parseNumbers: true})
             let validFiles = dataFile.filter(sample => (sample.name && sample._id && sample.size))
 
+            if(validFiles.length!==dataFile.length){
+                return res.status(400).json({msg:'File Rejected : Data in .csv file Incorrect/Incomplete',status:'rejected'});
+            }
+
             Batch.insertMany(validFiles).then(result => {
-                res.status(200).json({msg: 'Insert Successful', success: result});
-            })
-                .catch(error => {
-                    return res.status(400).json({msg: 'Could Not Insert Files',failure:error});
+                    res.status(200).json({msg: 'Insert Successful', success: result,status:'success'});
                 })
+                    .catch(error => {
+                        return res.status(400).json({msg: 'Could Not Insert Files',error:error});
+                    })
+
         })
     });
 });

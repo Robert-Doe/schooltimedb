@@ -1,7 +1,7 @@
 const mongoose = require('mongoose')
 
 const hallSchema = new mongoose.Schema({
-    name: String,
+    _id: String,
     location: String,
     size: Number,
     type: String,
